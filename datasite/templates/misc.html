@@ -1,0 +1,139 @@
+
+    <!--
+        <script type="text/javascript" src="/static/js/d3.min.js"></script>
+        <div class="chart"></div>
+        <br>
+        <div id="viz"></div>
+        <br>
+        <div id="placeholder">
+    -->
+
+    <!--
+    <script type="text/javascript">
+
+        // Get JSON data from Django to Front-End, on Firefox use: alert(data.toSource())
+        //var data = {{ test_data_as_json|safe }};
+        var data;
+        d3.json("http://127.0.0.1:8000/program/?format=json", function(error, json){
+            if (error) return console.warn(error);
+
+            // Load in data
+            data = json;
+
+            // Debugging
+            //alert( data[0].id); // Displays id of first object
+            //alert( data[0].hours_spent); // Displays hours_spent (e.g. '1')
+            //alert( data[0].time.date_select ); // Displays date (e.g. '2014-06-28')
+            //alert( data[0].time.user.username ); // Displays username (e.g. 'williamliu')
+            //alert( data[0].program_select.program_name)  // Displays program (e.g.'National Football League')
+
+            for (var i=0; i<data.length; i++){
+                //alert(i) // Loops through 0 - 16 out of 17 objects
+            }
+
+        });
+
+        // Put header on table
+        var tr;
+        tr = $('<tr>');
+        tr.append("<th>" + "Date" + "</th>");
+        tr.append("<th>" + "Program" + "</th>");
+        tr.append("<th>" + "Primary Key" + "</th>");
+        tr.append("<th>" + "Hours Spent" + "</th>");
+        tr.append("<th>" + "Minutes Spent" + "</th>");
+        $('table').append(tr);
+
+
+        /*
+        // Add in fields to 'details' table
+        for (var i=0; i<data.length; i++){
+            tr = $('<tr>');
+            tr.append("<td>" + data[i].fields.time + "</td>");
+            tr.append("<td>" + data[i].fields.program_select + "</td>");
+            tr.append("<td>" + data[i].pk + "</td>");
+            tr.append("<td>" + data[i].fields.hours_spent + "</td>");
+            tr.append("<td>" + data[i].fields.minutes_spent + "</td>");
+            $('table').append(tr);
+        }
+
+        // D3 sample
+        d3.select(".chart")
+            .selectAll("div")
+            .data(data)
+            .enter()
+            .append("p")
+            .text(function(d){
+                return "This is the hours spent " + d.fields.hours_spent;
+            });
+        */
+
+    </script>
+    -->
+
+
+
+    <!-- Get Data as JSON from views.py with D3 manipulation -->
+    <!--
+    <script>
+        var data = {{ test_data_as_json|safe }};
+
+        var x = d3.scale.linear()
+        .domain([0, d3.max(data)])
+        .range([0, 420]);
+
+        d3.select(".chart")
+            .selectAll("div")
+            .data(data)
+            .enter().append("div")
+            .style("width", function(d)
+            { return x(d) + "px"; })
+            .text(function(d) { return d; });
+
+    </script>
+
+    $.getJSON('http://127.0.0.1:8000/api/v1/program/?format=json', function(data){
+        var x = d3.scale.linear()
+        .domain([0, d3.max(data)])
+        .range([0, 420]);
+
+        d3.select(".chart")
+            .selectAll("div")
+            .data(data)
+            .enter().append("div")
+            .style("width", function(d)
+            { return x(d) + "px"; })
+            .text(function(d) { return d; });
+    }) -->
+
+    <!--
+        // Loop through each cell and add in details
+        $.each(data, function(key, value){
+            console.log(key, value);
+            //var tr;
+            for (var i=0; i<data.length; i++){
+                tr = $('<tr>');
+                tr.append("<td>" + data[i].pk + "</td>");
+                tr.append("<td>" + data[i].fields.hours_spent + "</td>");
+                tr.append("<td>" + data[i].fields.minutes_spent + "</td>");
+                $('table').append(tr);
+            }
+            /*
+            var tr;
+            for (var i=0; i<data.length; i++){
+                tr = $('<tr>');
+                tr.append("<td>" + data[i].fields.hours_spent + "</td>");
+                $('table').append(tr);
+            }
+
+        });
+
+
+        /*
+        alert(data.toSource())  // On Console in Firefox
+        for (var key in data){
+            if (data.hasOwnProperty(key)){
+                alert(key + " -> " + data[key]);
+            }
+        }
+        */
+    -->

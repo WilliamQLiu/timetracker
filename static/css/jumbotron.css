@@ -1,0 +1,31 @@
+/* Chart is for reporting.html */
+.chart div {
+    font: 10px sans-serif;
+    background-color: #0000FF;
+    text-align: right;
+    padding: 3px;
+    margin: 1px;
+    color: black;
+    border: 2px solid;
+}
+
+
+/* Make navbar align up with buttons */
+.navbar-brand{
+  line-height: 40px;
+}
+
+
+/* Make sign in form not stretch across entire page */
+ .form-signin{
+  max-width: 400px;
+  padding: 15px;
+  margin: 0 auto;
+ }
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+

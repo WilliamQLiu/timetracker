@@ -1,0 +1,8 @@
+USE dataentry;
+LOAD DATA INFILE "/Users/williamliu/dumps/data.csv"
+INTO TABLE ddh_text
+COLUMNS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+ESCAPED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;

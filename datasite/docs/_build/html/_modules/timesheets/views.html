@@ -1,0 +1,387 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>timesheets.views &mdash; timesheets  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="timesheets  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for timesheets.views</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">RequestContext</span><span class="p">,</span> <span class="n">Http404</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth</span> <span class="kn">import</span> <span class="n">authenticate</span><span class="p">,</span> <span class="n">login</span><span class="p">,</span> <span class="n">logout</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>  <span class="c"># uUe login_required decorator</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span><span class="p">,</span> <span class="n">HttpResponse</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Program</span><span class="p">,</span> <span class="n">Time</span>
+<span class="kn">from</span> <span class="nn">.forms</span> <span class="kn">import</span> <span class="n">ProgramForm</span><span class="p">,</span> <span class="n">TimeForm</span><span class="p">,</span> <span class="n">UserForm</span>  <span class="c"># Use models instead of forms when filtering</span>
+
+<span class="kn">from</span> <span class="nn">django.views.generic</span> <span class="kn">import</span> <span class="n">View</span><span class="p">,</span> <span class="n">ListView</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">,</span> <span class="n">DeleteView</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="c"># Create your views here.</span>
+<span class="c"># Views are the contents of a page (while urls.py is what routes the urls here)</span>
+<span class="c"># Takes in HttpRequest and returns HttpResponse</span>
+
+
+<span class="c">### Trying out Class-Based Views</span>
+<span class="c">#class SimplestClassView(View):</span>
+<span class="c">#    def get(self, request, *args, **kwargs):</span>
+<span class="c">#        return HttpResponse(&quot;Hello, world&quot;)</span>
+
+<span class="kn">from</span> <span class="nn">django.utils.decorators</span> <span class="kn">import</span> <span class="n">method_decorator</span>
+<div class="viewcode-block" id="LoggedInMixin"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.LoggedInMixin">[docs]</a><span class="k">class</span> <span class="nc">LoggedInMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Mixin to ensure user is logged in &quot;&quot;&quot;</span>
+    <span class="nd">@method_decorator</span><span class="p">(</span><span class="n">login_required</span><span class="p">)</span>
+<div class="viewcode-block" id="LoggedInMixin.dispatch"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.LoggedInMixin.dispatch">[docs]</a>    <span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">LoggedInMixin</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="ProgramListView"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramListView">[docs]</a><span class="k">class</span> <span class="nc">ProgramListView</span><span class="p">(</span><span class="n">LoggedInMixin</span><span class="p">,</span> <span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Program</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&quot;program_list.html&quot;</span>
+
+<div class="viewcode-block" id="ProgramListView.get_success_url"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramListView.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;program-list&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ProgramListView.queryset"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramListView.queryset">[docs]</a>    <span class="k">def</span> <span class="nf">queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return only times and programs for the current user&quot;&quot;&quot;</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">Time</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Program</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">&#39;Time&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">time_id</span><span class="o">=</span><span class="n">times</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;-time__date_select&#39;</span><span class="p">)</span>
+</div></div>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">class ProgramCreateView(LoggedInMixin, CreateView):</span>
+<span class="sd">    model = Program</span>
+<span class="sd">    template_name = &quot;program_create.html&quot;</span>
+
+<span class="sd">    def get_success_url(self):</span>
+<span class="sd">        return reverse(&#39;program-list&#39;)</span>
+
+<span class="sd">    def get_context_data(self, **kwargs):</span>
+<span class="sd">        &quot;&quot;&quot; Use the same template for Create View and Update View &quot;&quot;&quot;</span>
+<span class="sd">        context = super(ProgramCreateView, self).get_context_data(**kwargs)</span>
+<span class="sd">        context[&#39;action&#39;] = reverse(&#39;program-create&#39;)</span>
+<span class="sd">        return context</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c">#@login_required(redirect_field_name=&#39;register&#39;)</span>
+<span class="nd">@login_required</span>
+<div class="viewcode-block" id="programcreate"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.programcreate">[docs]</a><span class="k">def</span> <span class="nf">programcreate</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Takes in a URL request and returns a response &quot;&quot;&quot;</span>
+
+    <span class="c">#time_form = TimeForm(request.POST or None)</span>
+    <span class="n">time_form</span> <span class="o">=</span> <span class="n">TimeForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">or</span> <span class="bp">None</span><span class="p">)</span>
+    <span class="n">program_form</span> <span class="o">=</span> <span class="n">ProgramForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="ow">or</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">time_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">program_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+        <span class="c"># Save time_form</span>
+        <span class="n">time_form</span> <span class="o">=</span> <span class="n">TimeForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="n">time_form</span> <span class="o">=</span> <span class="n">time_form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">time_form</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">time_form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Save program_form</span>
+        <span class="n">save_pf</span> <span class="o">=</span> <span class="n">program_form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">save_pf</span><span class="o">.</span><span class="n">time_id</span> <span class="o">=</span> <span class="n">time_form</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">save_pf</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c"># Message to play after submitting</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#39;Thanks!&#39;</span><span class="p">)</span>
+
+        <span class="c">#Return authenticated user, if any</span>
+        <span class="c">#username = None</span>
+        <span class="c">#if request.user.is_authenticated():</span>
+        <span class="c">#    username = request.user.username</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>  <span class="c">#Reset form for more data entry</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;program_create.html&quot;</span><span class="p">,</span>
+                              <span class="nb">locals</span><span class="p">(),</span>
+                              <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                              <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ProgramUpdateView"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramUpdateView">[docs]</a><span class="k">class</span> <span class="nc">ProgramUpdateView</span><span class="p">(</span><span class="n">LoggedInMixin</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Program</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&quot;program_update.html&quot;</span>
+
+<div class="viewcode-block" id="ProgramUpdateView.get_success_url"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramUpdateView.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;program-list&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ProgramUpdateView.get_context_data"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramUpdateView.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Use the same template for Create View and Update View &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ProgramUpdateView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s">&#39;action&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;program-update&#39;</span><span class="p">,</span>
+                                    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;pk&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">context</span>
+
+</div></div>
+<div class="viewcode-block" id="ProgramDeleteView"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramDeleteView">[docs]</a><span class="k">class</span> <span class="nc">ProgramDeleteView</span><span class="p">(</span><span class="n">LoggedInMixin</span><span class="p">,</span> <span class="n">DeleteView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Program</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&quot;program_delete.html&quot;</span>
+
+<div class="viewcode-block" id="ProgramDeleteView.get_success_url"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.ProgramDeleteView.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;program-list&#39;</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="base"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.base">[docs]</a><span class="k">def</span> <span class="nf">base</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c">#users = User.objects.filter(is_active=True)</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;base.html&quot;</span><span class="p">,</span>
+                              <span class="nb">locals</span><span class="p">(),</span>
+                              <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                              <span class="p">)</span>
+
+
+<span class="c"># Testing - Just a blank page</span></div>
+<div class="viewcode-block" id="blank"><a class="viewcode-back" href="../../timesheets.html#timesheets.views.blank">[docs]</a><span class="k">def</span> <span class="nf">blank</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;blank.html&quot;</span><span class="p">,</span>
+                              <span class="nb">locals</span><span class="p">(),</span>
+                              <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                              <span class="p">)</span>
+
+</div>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">def register(request):</span>
+<span class="sd">    &quot;&quot;&quot; Login Page &quot;&quot;&quot;</span>
+<span class="sd">    context = RequestContext(request)</span>
+<span class="sd">    registered = False  # Tells template if registration was successful</span>
+
+<span class="sd">    # If request is a HTTP POST, then process form data</span>
+<span class="sd">    if request.method == &#39;POST&#39;:</span>
+<span class="sd">        # Get information from the raw form information</span>
+<span class="sd">        user_form = UserForm(data=request.POST)</span>
+
+<span class="sd">        if user_form.is_valid():</span>
+<span class="sd">            # Save the user&#39;s form data to the database</span>
+<span class="sd">            user = user_form.save()</span>
+
+<span class="sd">            # Hash the password with the set_password method</span>
+<span class="sd">            user.set_password(user.password)</span>
+<span class="sd">            user.save()</span>
+
+<span class="sd">            # Update our variable to tell registration was successful</span>
+<span class="sd">            registered = True</span>
+
+<span class="sd">        # Invalid form or forms - Print problems to terminal and user</span>
+<span class="sd">        else:</span>
+<span class="sd">            print user_form.errors</span>
+
+<span class="sd">    # Not a HTTP POST, so we render our form using ModelForm instance</span>
+<span class="sd">    # Forms will be blank, ready for user input</span>
+<span class="sd">    else:</span>
+<span class="sd">        user_form = UserForm()</span>
+
+<span class="sd">    return render_to_response(&#39;register.html&#39;,</span>
+<span class="sd">                              {&#39;user_form&#39;: user_form,</span>
+<span class="sd">                               &#39;registered&#39;: registered},</span>
+<span class="sd">                              context)</span>
+
+
+<span class="sd">def user_login(request):</span>
+<span class="sd">    &quot;&quot;&quot; Check if user can login &quot;&quot;&quot;</span>
+<span class="sd">    context = RequestContext(request)</span>
+<span class="sd">    # If request is a HTTP POST, then get relevant information</span>
+<span class="sd">    if request.method == &#39;POST&#39;:</span>
+<span class="sd">        # Get username and password provided by the user</span>
+<span class="sd">        username = request.POST[&#39;username&#39;]</span>
+<span class="sd">        password = request.POST[&#39;password&#39;]</span>
+
+<span class="sd">        # See if username/password combo is valid - User object returned if it is</span>
+<span class="sd">        user = authenticate(username=username, password=password)</span>
+
+<span class="sd">        # If we have a User object, then details are correct</span>
+<span class="sd">        # If Non, then no user match</span>
+<span class="sd">        if user:</span>
+<span class="sd">            # Check if the account is active, might have been disabled</span>
+<span class="sd">            if user.is_active:</span>
+<span class="sd">                # If the account is valid and active, log the user in</span>
+<span class="sd">                login(request, user)</span>
+<span class="sd">                return HttpResponseRedirect(&#39;enter.html&#39;)</span>
+<span class="sd">            else:</span>
+<span class="sd">                # An inactive account was used</span>
+<span class="sd">                return HttpResponse(&quot;Your account has been disabled by the admin.  Please contact mhahelpdesk@mhaofnyc.org&quot;)</span>
+<span class="sd">        else:</span>
+<span class="sd">            # Bad login details were provided</span>
+<span class="sd">            print &quot;Invalid login details for: {0}&quot;.format(username)</span>
+<span class="sd">            return HttpResponse(&quot;Invalid login details&quot;)  #TO-DO Replace with Invalid Login Page</span>
+
+<span class="sd">    # If request is not a HTTP POST, so display the login form</span>
+<span class="sd">    else:</span>
+<span class="sd">        # No context variables to pass the template</span>
+<span class="sd">        return render_to_response(&#39;login.html&#39;, {}, context)</span>
+<span class="sd">        #return HttpResponse(&quot;ERROR&quot;)</span>
+
+
+<span class="sd">@login_required</span>
+<span class="sd">def user_logout(request):</span>
+<span class="sd">    # Since we know user is logged in already to see this</span>
+<span class="sd">    logout(request)</span>
+
+<span class="sd">    # Take the user back to the homepage</span>
+<span class="sd">    return HttpResponseRedirect(&#39;/&#39;)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">#@login_required(redirect_field_name=&#39;register&#39;)</span>
+<span class="sd">@login_required</span>
+<span class="sd">def enter(request):</span>
+<span class="sd">    &quot;&quot;&quot; Takes in a URL request and returns a response &quot;&quot;&quot;</span>
+
+<span class="sd">    #time_form = TimeForm(request.POST or None)</span>
+<span class="sd">    time_form = TimeForm(request.POST or None)</span>
+<span class="sd">    program_form = ProgramForm(request.POST or None)</span>
+
+<span class="sd">    if time_form.is_valid() and program_form.is_valid():</span>
+<span class="sd">        # Save time_form</span>
+<span class="sd">        time_form = TimeForm(request.POST)</span>
+<span class="sd">        time_form = time_form.save(commit=False)</span>
+<span class="sd">        time_form.user = request.user</span>
+<span class="sd">        time_form.save()</span>
+
+<span class="sd">        # Save program_form</span>
+<span class="sd">        save_pf = program_form.save(commit=False)</span>
+<span class="sd">        save_pf.time_id = time_form.id</span>
+<span class="sd">        save_pf.save()</span>
+
+<span class="sd">        # Message to play after submitting</span>
+<span class="sd">        messages.success(request, &#39;Thanks!&#39;)</span>
+
+<span class="sd">        #Return authenticated user, if any</span>
+<span class="sd">        #username = None</span>
+<span class="sd">        #if request.user.is_authenticated():</span>
+<span class="sd">        #    username = request.user.username</span>
+<span class="sd">        return HttpResponseRedirect(&#39;&#39;)  #Reset form for more data entry</span>
+
+<span class="sd">    return render_to_response(&quot;enter.html&quot;,</span>
+<span class="sd">                              locals(),</span>
+<span class="sd">                              context_instance=RequestContext(request)</span>
+<span class="sd">                              )</span>
+
+<span class="sd"># Testing - http://127.0.0.1:8000/all</span>
+<span class="sd">@login_required</span>
+<span class="sd">def all(request):</span>
+<span class="sd">    &quot;&quot;&quot; Shows all times that are active for user&quot;&quot;&quot;</span>
+<span class="sd">    times = Time.objects.select_related().all().filter(user_id=request.user)</span>
+<span class="sd">    programs = Program.objects.all().select_related(&#39;Time&#39;).filter(time_id=times).order_by(&#39;-time__date_select&#39;)</span>
+<span class="sd">    return render_to_response(&quot;all.html&quot;, locals(), context_instance=RequestContext(request)</span>
+<span class="sd">                              )</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@login_required</span>
+<span class="sd">def all_old(request):</span>
+<span class="sd">    users = User.objects.filter(is_active=True)  # Get time for first user, Will</span>
+<span class="sd">    #times = Time.objects.all() # Get all Dates for all users</span>
+<span class="sd">    #times = Time.objects.all() #filter(user_id=1)  # Get all Times for Test User</span>
+<span class="sd">    times = Time.objects.all() # Get all Times for Test User</span>
+<span class="sd">    #times = Time.objects.all().select_related(&#39;Program&#39;).filter(user_id=users) # Get all Times for all Users</span>
+<span class="sd">    #all_fields = Time._meta.get_all_field_names()</span>
+<span class="sd">    #specific_field = Time._meta.get_field(timestamp_created)</span>
+<span class="sd">    #programs = Program.objects.filter(time_id=times)</span>
+<span class="sd">    programs = Program.objects.all().select_related(&#39;Time&#39;).filter(time_id=times)</span>
+<span class="sd">    return render_to_response(&quot;all.html&quot;, locals(), context_instance=RequestContext(request)</span>
+<span class="sd">                              )&quot;&quot;&quot;</span>
+
+
+<span class="sd"># Testing - e.g. http://127.0.0.1:8000/members/williamliu/</span>
+<span class="sd">@login_required</span>
+<span class="sd">def single_user(request, username):</span>
+<span class="sd">    &quot;&quot;&quot; Shows only a single user name that is active &quot;&quot;&quot;</span>
+<span class="sd">    try:</span>
+<span class="sd">        user = User.objects.get(username=username)</span>
+<span class="sd">        if user.is_active:</span>
+<span class="sd">            single_user = user  #Get specific user</span>
+<span class="sd">            #times = Time.objects.select_related().all().filter(user_id=single_user)  #Get specific users times</span>
+<span class="sd">            times = Time.objects.select_related().all().filter(user_id=request.user)</span>
+<span class="sd">            programs = Program.objects.all().select_related(&#39;time_id&#39;).filter(time_id=times)</span>
+<span class="sd">    except Exception:</span>
+<span class="sd">        raise Http404</span>
+
+<span class="sd">    return render_to_response(&quot;single_user.html&quot;,</span>
+<span class="sd">                              locals(),</span>
+<span class="sd">                              context_instance=RequestContext(request)</span>
+<span class="sd">                              )</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

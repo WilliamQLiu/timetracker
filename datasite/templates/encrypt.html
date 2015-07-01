@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Encrypt Page</h2>
+
+<form action='' method='get'>
+    <!-- {{ date_form }} -->
+    <h6>If putting in salary information, do not put in '$' or ','</h6>
+    <h5>Encrypt This: {{ encrypt_form.raw_message }}
+    <input type="submit" value="Submit" class="btn btn-lrg btn-danger"/></h5>
+</form>
+
+<h5>Use This:</h5>
+<h5>{{ encrypted_message }} </h5>
+
+{% endblock %}

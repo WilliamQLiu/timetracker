@@ -1,0 +1,32 @@
+{% extends 'base.html' %} {% block content %}
+
+<p>
+    Hello {{ single_user }}, this is your timesheet:
+</p>
+
+<div class="table-responsive">
+    <table class="table" border="2">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Program</th>
+                <th>Hours Spent</th>
+                <th>Minutes Spent</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        {% for program in programs %}
+        <tbody>
+            <tr>
+                <td>{{ program.time.date_select }}</td>
+                <td>{{ program.program_select }}</td>
+                <td>{{ program.hours_spent }}</td>
+                <td>{{ program.minutes_spent }}</td>
+                <td>{{ program.notes }} </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>timesheets.tests &mdash; timesheets  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="timesheets  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for timesheets.tests</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">resolve</span>
+<span class="kn">from</span> <span class="nn">django.test</span> <span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">render_to_response</span>
+<span class="kn">from</span> <span class="nn">django.template.loader</span> <span class="kn">import</span> <span class="n">render_to_string</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="kn">from</span> <span class="nn">timesheets.models</span> <span class="kn">import</span> <span class="n">Program</span>  <span class="c"># To test Models</span>
+<span class="kn">from</span> <span class="nn">timesheets.forms</span> <span class="kn">import</span> <span class="n">ProgramForm</span>  <span class="c"># To test Forms</span>
+<span class="kn">from</span> <span class="nn">timesheets.views</span> <span class="kn">import</span> <span class="n">blank</span>
+
+<span class="sd">&quot;&quot;&quot; Unit Tests help you write code that is clean and bug free</span>
+<span class="sd">    Each line of production code we write should be tested by at least</span>
+<span class="sd">    one of our unit tests</span>
+
+
+<span class="sd">    Run specific tests for an application using: python manage.py test</span>
+
+
+<span class="sd">    COVERAGE</span>
+<span class="sd">    Check test coverage with: coverage run manage.py test</span>
+<span class="sd">    Run test coverage report with: coverage html --include=&quot;timesheets/*.*&quot; and</span>
+<span class="sd">    then look under folder &#39;htmlcov&#39; &gt; &#39;index.html&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c">### Test to see if Pages are routed correctly</span>
+
+<span class="c"># Blank Page - url(r&#39;^$&#39;&#39;)</span>
+
+<div class="viewcode-block" id="MainPageTest"><a class="viewcode-back" href="../../timesheets.html#timesheets.tests.MainPageTest">[docs]</a><span class="k">class</span> <span class="nc">MainPageTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MainPageTest.test_root_url_resolves_to_blank_page_view"><a class="viewcode-back" href="../../timesheets.html#timesheets.tests.MainPageTest.test_root_url_resolves_to_blank_page_view">[docs]</a>    <span class="k">def</span> <span class="nf">test_root_url_resolves_to_blank_page_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">blank</span><span class="p">)</span>  <span class="c"># Found the main page url and function</span>
+</div>
+<div class="viewcode-block" id="MainPageTest.test_blank_page_returns_correct_html"><a class="viewcode-back" href="../../timesheets.html#timesheets.tests.MainPageTest.test_blank_page_returns_correct_html">[docs]</a>    <span class="k">def</span> <span class="nf">test_blank_page_returns_correct_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">HttpRequest</span><span class="p">()</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">blank</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c"># Decode helps us convert from reponse.content bytes to unicode strings</span>
+        <span class="n">expected_html</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&quot;blank.html&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span> <span class="n">expected_html</span><span class="p">)</span>
+        <span class="c">#print repr(response.content.decode()) # Print response for debugging</span>
+
+        <span class="c"># Check response&#39;s start and end contents</span>
+        <span class="c"># response.content is raw bytes, not a Python string so needs b&#39;&#39; syntax</span>
+        <span class="c">#self.assertTrue(response.content.startswith(b&#39;&lt;!DOCTYPE html&gt;&#39;))</span>
+        <span class="c">#self.assertIn(b&#39;&lt;h1&gt;Welcome to MHA&lt;/h1&gt;&#39;, response.content)</span>
+        <span class="c">#self.assertIn(b&#39;&lt;/html&gt;&#39;, response.content)</span>
+        <span class="c">#print repr(response.content)</span>
+</div></div>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="sd">class ProgramModelTests(TestCase):</span>
+<span class="sd">    &quot;&quot;&quot; Program Model Tests &quot;&quot;&quot;</span>
+
+<span class="sd">    def test_str(self):</span>
+<span class="sd">        notes = Program(</span>
+<span class="sd">                          notes=&#39;Hello world!&#39;)</span>
+
+<span class="sd">        self.assertEquals(str(notes),</span>
+<span class="sd">                          &#39;Hello world&#39;,</span>
+<span class="sd">                          )</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="c">### Form Tests Below</span>
+
+<div class="viewcode-block" id="ProgramFormTest"><a class="viewcode-back" href="../../timesheets.html#timesheets.tests.ProgramFormTest">[docs]</a><span class="k">class</span> <span class="nc">ProgramFormTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Program Form Test &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ProgramFormTest.test_validation"><a class="viewcode-back" href="../../timesheets.html#timesheets.tests.ProgramFormTest.test_validation">[docs]</a>    <span class="k">def</span> <span class="nf">test_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">form_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;hours_spent&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+            <span class="s">&#39;minutes_spent&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s">&#39;notes&#39;</span><span class="p">:</span> <span class="s">&#39;X&#39;</span> <span class="o">*</span> <span class="mi">300</span>
+        <span class="p">}</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">ProgramForm</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">form_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">())</span>
+
+
+
+<span class="c">### Main</span></div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">warnings</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if programs %}
+
+<h2>Times for {{ user.username }}</h2>
+
+<div class="table-responsive">
+    <table class="table" border="2">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Date</th>
+                <th>Program</th>
+                <th>Hours Spent</th>
+                <th>Minutes Spent</th>
+                <th>Notes</th>
+                <th>Remove</th>
+            </tr>
+    {% for program in programs %}
+        <tbody>
+            <tr>
+                <td> {{ program.time.user }} </td>
+                <td> {{ program.time.date_select }} </td>
+                <td> {{ program.program_select }} </td>
+                <td> {{ program.hours_spent }} </td>
+                <td> {{ program.minutes_spent }} </td>
+                <td> {{ program.notes }} </td>
+                <td> {{ program.id }} </td>
+
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+    {% else %}
+        <h2>No times entered yet for {{ user.username }}</h2>
+</div>
+
+{% endif %}
+
+{% endblock %}

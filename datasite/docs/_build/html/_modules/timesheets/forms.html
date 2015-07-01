@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>timesheets.forms &mdash; timesheets  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="timesheets  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for timesheets.forms</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">Time</span><span class="p">,</span> <span class="n">Program</span><span class="p">,</span> <span class="n">CostCode</span>
+
+
+<span class="c"># Used to create a custom widget for selecting time as date instead of text</span>
+<div class="viewcode-block" id="DateInput"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.DateInput">[docs]</a><span class="k">class</span> <span class="nc">DateInput</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">DateInput</span><span class="p">):</span>
+    <span class="n">input_type</span> <span class="o">=</span> <span class="s">&#39;date&#39;</span>
+</div>
+<div class="viewcode-block" id="TimeForm"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.TimeForm">[docs]</a><span class="k">class</span> <span class="nc">TimeForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeForm.Meta"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.TimeForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Time</span>
+        <span class="c"># For template enter.html, try Form.as_table()</span>
+        <span class="c"># widgets = {&#39;username&#39;: forms.HiddenInput}  # Added 5/23</span>
+        <span class="c">#    date_select = forms.DateField(widget = AdminDateWidget)  # To get calendar</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;date_select&#39;</span><span class="p">]</span>  <span class="c"># Explicitly list only these fields</span>
+        <span class="c">#def __init__(self, *args, **kwargs):</span>
+        <span class="c">#    self.fields[&#39;date_select&#39;].widget = widgets.AdminDateWidget()</span>
+        <span class="c">#widgets = {</span>
+        <span class="c">#    &#39;date_select&#39;: DateInput(attrs={&#39;type&#39;:&#39;date&#39;, &#39;class&#39;:&#39;datepicker&#39;})</span>
+        <span class="c">#}</span>
+        <span class="n">date_select</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+
+</div></div>
+<div class="viewcode-block" id="ProgramForm"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.ProgramForm">[docs]</a><span class="k">class</span> <span class="nc">ProgramForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+<div class="viewcode-block" id="ProgramForm.Meta"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.ProgramForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Program</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;time&#39;</span><span class="p">,</span> <span class="p">)</span>  <span class="c"># returns error since its a foreignkey</span>
+        <span class="c">#widgets = {&#39;entertime&#39;: forms.HiddenInput}</span>
+        <span class="c">#Hides the field, but still there</span>
+
+</div></div>
+<div class="viewcode-block" id="UserForm"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.UserForm">[docs]</a><span class="k">class</span> <span class="nc">UserForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">PasswordInput</span><span class="p">())</span>  <span class="c"># Hide text</span>
+
+<div class="viewcode-block" id="UserForm.Meta"><a class="viewcode-back" href="../../timesheets.html#timesheets.forms.UserForm.Meta">[docs]</a>    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">User</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">,</span> <span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="s">&#39;password&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

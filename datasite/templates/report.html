@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>Filters</h2>
+    <h5><i>Select your report filters below, then click 'Query' to update data</i></h5>
+    <body>
+    <form action='' method='get'>
+    <!-- {{ date_form }} -->
+        <h5>Start Date: {{ date_form.start_date }} End Date: {{ date_form.end_date }} </h5>
+        <h5>Display as: {{ date_form.percentage }}</h5>
+        <input type="submit" value="Query" class="btn btn-lrg btn-danger"/>
+    </form>
+    <br>
+        <h2>Time Spent By Person</h2>
+        {% if df %}
+            {{ df|safe }}
+        {% endif %}
+        <h6>Click to download
+        <a href="{% url "download-summary" %}">Summary</a> or
+        <a href="{% url "download-raw" %}">Raw Data</a>
+        </h6>
+        <br>
+
+        {% if user.is_staff %}
+            <h2>Dollars Spent by Department</h2>
+            {% if dept %}
+                {{ dept|safe }}
+            {% endif %}
+        {% endif %}
+    </body>
+
+{% endblock %}
+

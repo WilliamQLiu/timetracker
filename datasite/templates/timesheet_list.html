@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if object_list %}
+<h2>Timesheet for {{ user.username }}</h2>
+
+<a id='id_program_create' href="{% url "program-create" %}">Click here to add time</a>
+<br>
+<br>
+<div class="table-responsive">
+    <table class="table" border="2">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Program</th>
+                <th>Hours Spent</th>
+                <th>Minutes Spent</th>
+                <th>Notes</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+    {% for program in object_list %}
+        <tbody>
+            <tr>
+                <td> {{ program.time.date_select }} </td>
+                <td> {{ program.program_select }} </td>
+                <td> {{ program.hours_spent }} </td>
+                <td> {{ program.minutes_spent }} </td>
+                <td> {{ program.notes }} </td>
+                <td> <a href="{% url "program-update" pk=program.id %}">Edit</a> </td>
+                <td> <a href="{% url "program-delete" pk=program.id %}">Delete</a> </td>
+            </tr>
+        </tbody>
+    {% endfor %}
+    </table>
+    {% else %}
+        <h2>No times entered yet for {{ user.username }}</h2>
+        <a href="{% url "program-create" %}">Click here to add time</a>
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

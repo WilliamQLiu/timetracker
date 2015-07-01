@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>timesheets.models &mdash; timesheets  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="timesheets  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for timesheets.models</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.utils.encoding</span> <span class="kn">import</span> <span class="n">smart_unicode</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+
+
+<div class="viewcode-block" id="Time"><a class="viewcode-back" href="../../timesheets.html#timesheets.models.Time">[docs]</a><span class="k">class</span> <span class="nc">Time</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Enter time &quot;&quot;&quot;</span>
+    <span class="c"># A primary key &#39;id&#39; is automatically created</span>
+    <span class="c"># id = models.AutoField(primary_key=True)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+    <span class="n">date_select</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+    <span class="n">timestamp_created</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>  <span class="c"># Update now</span>
+                                             <span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span>  <span class="c"># When create</span>
+                                             <span class="p">)</span>
+    <span class="n">timestamp_updated</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c"># Update now</span>
+                                             <span class="n">auto_now_add</span><span class="o">=</span><span class="bp">False</span>  <span class="c"># When create</span>
+                                             <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">smart_unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">date_select</span><span class="p">)</span>  <span class="c"># Name is the Date</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;-date_select&#39;</span><span class="p">]</span>  <span class="c"># Automatically order by latest first</span>
+
+
+</div>
+<div class="viewcode-block" id="CostCode"><a class="viewcode-back" href="../../timesheets.html#timesheets.models.CostCode">[docs]</a><span class="k">class</span> <span class="nc">CostCode</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Select list of Programs and Cost Codes &quot;&quot;&quot;</span>
+
+    <span class="n">program_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">cost_code</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">smart_unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">program_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Program"><a class="viewcode-back" href="../../timesheets.html#timesheets.models.Program">[docs]</a><span class="k">class</span> <span class="nc">Program</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Enter time spent on program &quot;&quot;&quot;</span>
+
+    <span class="c">#Define a many-to-one relation</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Time</span><span class="p">)</span>
+    <span class="c">#time = models.ManyToManyField(Time)</span>
+    <span class="c">#entertime = models.ManyToManyField(EnterTime)</span>
+    <span class="c">#Define a many-to-many relation</span>
+
+
+    <span class="c">#PROGRAM1 = &#39;NSPL&#39;</span>
+    <span class="c">#PROGRAM2 = &#39;DDH&#39;</span>
+    <span class="c">#PROGRAM3 = &#39;DOHMH&#39;</span>
+    <span class="c">#PROGRAM4 = &#39;NFL&#39;</span>
+    <span class="c">#PROGRAM_CHOICES = (</span>
+    <span class="c">#    (PROGRAM1, &#39;National Suicide Prevention Lifeline&#39;),</span>
+    <span class="c">#    (PROGRAM2, &#39;Disaster Distress Helpline&#39;),</span>
+    <span class="c">#    (PROGRAM3, &#39;Department of Health and Mental Hygiene&#39;),</span>
+    <span class="c">#    (PROGRAM4, &#39;National Football League Lifeline&#39;),</span>
+    <span class="c">#    )</span>
+
+    <span class="c">#program_select = models.CharField(max_length=255,</span>
+    <span class="c">#                                  choices= CostCode.program_name,</span>
+    <span class="c">#                                  null=True,  # Not Required in Form</span>
+    <span class="c">#                                  blank=True</span>
+    <span class="c">#                                  )</span>
+
+    <span class="n">program_select</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">CostCode</span><span class="p">)</span>
+    <span class="n">hours_spent</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c"># Time Spent</span>
+    <span class="n">minutes_spent</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c"># Time Spent</span>
+    <span class="n">notes</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">smart_unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">program_select</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span>  <span class="c"># Automatically order by latest first</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">timesheets  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

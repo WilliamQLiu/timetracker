@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1> Delete Time </h1>
+<p> Are you sure you want to delete the time {{ program.id }}? </p>
+
+<form action="% url 'delete_time' pk=program.id %}" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Yes, delete."/>
+    <a href="{url "all" %}">No, cancel.</a>
+
+</form>
+
+{% endblock %}
+
