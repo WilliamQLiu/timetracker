@@ -12,7 +12,7 @@ billiard==3.3.0.18
 celery==3.1.12
 coverage==3.7.1
 django-celery==3.1.10
-django-debug-toolbar==1.2.1
+django-debug-toolbar==1.11.1
 django-filter==0.7
 django-model-utils==2.0.3
 django-pandas==0.2.0
